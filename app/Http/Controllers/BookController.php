@@ -43,7 +43,7 @@ class BookController extends Controller
         $data = $request->all();
 
         try {
-            $book = Books::findOrFail($$id);
+            $book = Books::findOrFail($id);
 
             $book->nisbn = $data['nisbn'];
             $book->title = $data['title'];
@@ -64,5 +64,15 @@ class BookController extends Controller
             $status = 'error';
             return response()->json(compact('status', 'th'), 200);
         }
+    }
+
+    public function deleteBook($id){
+
+        $book = Books::findOrFail($id);
+        $book->delete();
+
+        $status = "Delete Success";
+        return response()->json(compact('status'), 200);
+
     }
 }
