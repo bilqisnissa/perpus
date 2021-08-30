@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\BorrowController;
+use App\Http\Controllers\PublisherController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -38,3 +40,13 @@ Route::get('author/get/{id}', [AuthorController::class, 'readAuthor']);
 Route::post('author/create', [AuthorController::class, 'createAuthor']);
 Route::post('author/update/{id}', [AuthorController::class, 'updateAuthor']);
 Route::delete('author/delete/{id}', [AuthorController::class, 'deleteAuthor']);
+
+Route::get('publisher/get/{id}', [PublisherController::class, 'readPublisher']);
+Route::post('publisher/create', [PublisherController::class, 'createPublisher']);
+Route::post('publisher/update/{id}', [PublisherController::class, 'updatePublisher']);
+Route::delete('publisher/delete/{id}', [PublisherController::class, 'deletePublisher']);
+
+Route::get('borrow/get/{id}', [BorrowController::class, 'readBorrow']);
+Route::post('borrow/create', [BorrowController::class, 'createBorrow']);
+Route::post('borrow/update/{id}', [BorrowController::class, 'updateBorrow']);
+Route::delete('borrow/delete/{id}', [BorrowController::class, 'deleteBorrow']);
