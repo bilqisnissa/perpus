@@ -46,7 +46,7 @@ class UserController extends Controller
         $validator = Validator::make(
             $data, [
                 'name' => 'required|string|max:100',
-                'email' => 'required|email|unique:users, email', $id,
+                'email' => 'required|email|unique:users,email,'.$id,
                 'password' => 'required|string|min:6',
             ]
             );
