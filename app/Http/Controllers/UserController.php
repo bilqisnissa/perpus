@@ -14,117 +14,68 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    //fungsi untuk mengatur register / create user
-    public function registerUser(Request $request){
-
-        //buat variable data yg berisi request (name, email, password)
-        $data = $request->only(['name', 'email', 'password']);
-
-        //validasi data dari user input 
-        $validator = Validator::make(
-            $data,
-            [
-                'name' => 'required|string|max:100',
-                'email' => 'required|string|email',
-                'password'=> 'required|string|min:6'
-            ]
-        );
-        
-        //jika validatornya gagal, maka muncul error
-        if($validator->fails()){
-            $errors = $validator->errors();
-            return response()->json(compact('errors'),401);
-        }
-
-        //buat user sesuai data tersebut
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
+    public function createUser(Request $request){
+        $data = $request->all();
+        $user = new User;
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->password = $data['password'];
         $user->save();
 
-        //menampilkan response berisi user dan token
-        //200 artinya sukses
-        return response()->json(compact('user'), 200);
+        //masukkin data phone
+        $user->phone()->create([
+            'phone' => $data['phone']
+        ]);
+        $user->phone;
+
+        $status = "success";
+        return response()->json(compact('user', 'status'), 200);
     }
 
-    //Fungsi login user
-    public function loginUser(Request $request){
-        
-        //mencari user dari inputan user menggunakan email
-        $user = User::where('email', $request['email'])->first();
-
-        //auth attempt untuk mengecek apakah data(email & password) sesuai
-        if($user&&Hash::check($request->password,$user->password)){
-            //membuat token
-            $token = Str::random(60);
-            $user->remember_token = $token;
-            $user->save();
-
-            return response()->json([
-                "status" => 200,
-                "massage"=> "success",
-                "token"=>$token,
-                "user"=>$user
-            ],200);
-        }
-        return response()->json([
-            "status"=>401,
-            "massage"=>"failed"
-        ],401);
-
-    }
-
-    //fungsi logout, menghapus token dari database
-    public function logoutUser(Request $request){
-        //mencari user menggunakan token
-        $user = User::where('remember_token', $request->bearerToken())->first();
-
-        //kalo user ada, jadiin token itu null
-        if($user){
-            $user->remember_token = null;
-            $user->save();
-            return response()->json([
-                "status"=>200,
-                "message"=>"success",
-            ],200);
-        }
-        return response()->json([
-            "status"=>401,
-            "message"=>"failed",
-        ],401);
-    }
-
-    //fungsi untuk mendapatkan data user / read user
     public function getUser($id){
         $user = User::find($id);
-        return response()->json(compact('user'),200);
+        $user->phone();
+        $status = "success";
+        return response()->json(compact('user', 'status'), 200);
     }
 
-    //fungsi untuk mengubah data user / update user
-    //parameternya adalah id dari user yg akan diubah dan request berisi inpuut user
     public function updateUser($id, Request $request){
+        $data = $request->all();
         $user = User::find($id);
-        $input = $request->all();
+        
+        $validator = Validator::make(
+            $data, [
+                'name' => 'required|string|max:100',
+                'email' => 'required|email|unique:users, email', $id,
+                'password' => 'required|string|min:6',
+            ]
+            );
 
-        if(isset($request->name)){
-            $user->name = $input['name'];
-        }
+            if($validator->fails()){
+                $error = $validator->errors();
+                return response()->json(compact('error'), 401);
+            }
 
-        if(isset($request->email)){
-            $user->email = $input['email'];
-        }
-
+        $data = $request->all;
+        $user = User::find($id);
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->password = $data['password'];
         $user->save();
 
-        return response()->json(compact('user'),200);
+        $user->phone()->phone = $data['phone'];
+        $user->push();
+
+        $status = "success";
+        return response()->json(compact('user', 'status'),200);
     }
 
-    //fungsi untuk menghapus user / delete user
     public function deleteUser($id){
         $user = User::find($id);
-        $result = $user->delete();
-        return response()->json(compact('result'),200);
+        $user->phone->delete();
+        $user->delete();
+        $status = "delete success";
+        return response()->json(compact('satus'),200);
     }
 
 }
