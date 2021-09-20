@@ -12,8 +12,9 @@ class CommentController extends Controller
         $data = $request->all();
         $comment = new Comment();
         $comment->post_id = $post->id;
-        $comment->title = $data['body'];
+        $comment->body = $data['body'];
         $comment->save();
+        $post->comment;
         $status = "success create comment";
         return response()->json(compact('post', 'status'), 200);
     }
@@ -24,6 +25,7 @@ class CommentController extends Controller
             $comment->body = $data['body'];
         }
         $comment->save();
+        $post->comment;
         $status = "success update comment";
         return response()->json(compact('post', 'status'), 200);
     }

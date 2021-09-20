@@ -41,6 +41,7 @@ class PostController extends Controller
             $post->url_image = $data['url_image'];
         }
         $post->save();
+        $status = "success updating data post";
         return response()->json(compact('post', 'status'), 200);
     }
 
